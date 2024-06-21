@@ -3,6 +3,7 @@ const { Branch } = require("./../models");
 // Branch Functions
 
 async function createBranch(data) {
+
   const branch = new Branch(data);
   await branch.save();
   return branch;
@@ -28,7 +29,7 @@ async function getBranchById(id) {
   const branch = await Branch.findOne({ branch_id: id });
   return branch;
 }
-async function getBranches_simple() {
+async function getBranches_simple(query) {
   const branches = await Branch.find(query, {
     year: 1,
     branch_code: 1,
@@ -37,6 +38,7 @@ async function getBranches_simple() {
     "sections.sec_id": 1,
     "sections.name": 1,
   });
+  return branches;
 }
 async function getBranchBy_Id(id) {
   const branch = await Branch.findById(id);

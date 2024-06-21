@@ -11,7 +11,6 @@ const employeeSchema = new Schema({
 const SubjectSchema = new Schema({
   subject_id: String,
   name: String,
-  branches_taught:[String],
 });
 
 const EmpRelationSchema = new Schema({

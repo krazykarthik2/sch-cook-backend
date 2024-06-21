@@ -7,12 +7,12 @@ async function createSubject(data) {
 }
 
 async function editSubject(id, data) {
-  const subject = await Subject.findByIdAndUpdate(id, data, { new: true });
+  const subject = await Subject.findOneAndUpdate({subject_id:id}, data, { new: true });
   return subject;
 }
 
 async function deleteSubject(id) {
-  await Subject.findByIdAndDelete(id);
+  await Subject.findOneAndDelete({subject_id:id});
 }
 
 async function getSubjects(query) {
