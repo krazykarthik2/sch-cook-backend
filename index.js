@@ -109,9 +109,10 @@ app.delete("/employee/delete/:id", async (req, res) => {
   }
 });
 //curl -X DELETE http://localhost:5000/employee/delete/kar25
-app.get("/employee/get", async (req, res) => {
+app.all("/employee/get", async (req, res) => {
   try {
     let employees;
+    console.log(req.body);
     if (req.body.get) {
       employees = await getEmployees({ emp_id: { $in: req.body.get } });
     } else {
@@ -187,7 +188,7 @@ app.get("/branch/get_simple", async (req, res) => {
 });
 //curl -X GET http://localhost:5000/branch/get_simple
 
-app.get("/branch/get", async (req, res) => {
+app.all("/branch/get", async (req, res) => {
   try {
     let branches;
     if (req.body.get) {
@@ -244,7 +245,7 @@ app.delete("/branchcode/delete/:id", async (req, res) => {
 });
 //curl -X DELETE http://localhost:5000/branchcode/delete/CME
 
-app.get("/branchcode/get", async (req, res) => {
+app.all("/branchcode/get", async (req, res) => {
   try {
     let branchcodes;
     if (req.body.get) {
@@ -354,11 +355,9 @@ app.delete(
 );
 //curl -X DELETE http://localhost:5000/branch/CME/section/CSE_A/timetable/delete"
 
-app.get("/subject/get", async (req, res) => {
+app.all("/subject/get", async (req, res) => {
   try {
     let subjects;
-    console.log("++++++++++++++++++++++++++++++++++++++++++++");
-    console.log(req.body);
     if (req.body.get) {
       subjects = await getSubjects({ subject_id: { $in: req.body.get } });
     } else {
@@ -412,7 +411,7 @@ app.delete("/subject/delete/:id", async (req, res) => {
 
 // EmpRelation Routes
 
-app.get("/relation/get", async (req, res) => {
+app.all("/relation/get", async (req, res) => {
   try {
     let relations;
     let opt = {};
