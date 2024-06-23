@@ -47,23 +47,25 @@ async function getEmployeeSchedule(emp_id) {
         (sec) => sec.sec_id === relation.sec_id
       );
       if (section) {
-        for (let day of section.timetable.keys()) {
-          let periods = section.timetable.get(day);
-          if (!schedule[day]) {
-            schedule[day] = [];
-          }
-          periods.forEach((subject, index) => {
-            if (subject === relation.subject_id) {
-              schedule[day][index] = {
-                branch_id: relation.branch_id,
-                sec_id: relation.sec_id,
-                subject_id: relation.subject_id,
-              };
-            } else {
-              //fill in blank data if teacher is idle
-              if (!schedule[day][index]) schedule[day][index] = null;
+        if (section.timetable) {
+          for (let day of section.timetable.keys()) {
+            let periods = section.timetable.get(day);
+            if (!schedule[day]) {
+              schedule[day] = [];
             }
-          });
+            periods.forEach((subject, index) => {
+              if (subject === relation.subject_id) {
+                schedule[day][index] = {
+                  branch_id: relation.branch_id,
+                  sec_id: relation.sec_id,
+                  subject_id: relation.subject_id,
+                };
+              } else {
+                //fill in blank data if teacher is idle
+                if (!schedule[day][index]) schedule[day][index] = null;
+              }
+            });
+          }
         }
       }
     }
