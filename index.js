@@ -147,6 +147,8 @@ app.get("/employee/timetable/get/:id", async (req, res) => {
 });
 //curl -X GET http://localhost:5000/employee/timetable/get/kar25
 
+
+
 // Branch Routes
 app.post("/branch/create", async (req, res) => {
   try {
