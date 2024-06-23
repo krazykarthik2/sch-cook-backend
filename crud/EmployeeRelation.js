@@ -16,7 +16,7 @@ async function editEmpRelation(id, data) {
 }
 
 async function deleteEmpRelation(id) {
-  await EmpRelation.findByIdAndDelete(id);
+  return await EmployeeRelation.findByIdAndDelete(id);
 }
 
 async function getEmpRelations(params) {
