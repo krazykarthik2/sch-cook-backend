@@ -69,7 +69,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-mongoose.connect("mongodb://localhost:27017/timetable", {
+mongoose.connect(process.env.MONGO_CON_STRING, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
