@@ -9,7 +9,10 @@ const {
   Organization,
 } = require("../models");
 const bcrypt = require("bcryptjs");
-
+async function getOrgs(query) {
+  const orgs = await Organization.find(query).populate("admin");
+  return orgs;
+}
 // Create Organization with Admin Credentials
 async function createOrgWithAdminCred({
   name,
@@ -19,8 +22,8 @@ async function createOrgWithAdminCred({
 }) {
   const _id = new mongoose.Types.ObjectId();
   const organization = new Organization({
-    name:name,
-    org_id:org_id,
+    name: name,
+    org_id: org_id,
     admin: _id,
   });
 
@@ -66,9 +69,11 @@ async function deleteOrgForever(id) {
 
   // Delete the organization
   await Organization.findByIdAndDelete(id);
+  return true;
 }
 
 module.exports = {
+  getOrgs,
   createOrgWithAdminCred,
   editOrg,
   deleteOrgForever,

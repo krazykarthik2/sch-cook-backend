@@ -55,6 +55,7 @@ const {
   createOrgWithAdminCred,
   editOrg,
   deleteOrgForever,
+  getOrgs,
 } = require("./org/Org");
 
 const {
@@ -197,6 +198,22 @@ app.delete(
 );
 
 //organization
+
+app.get(
+  "/organization/get",
+  [authenticate, authorize("governer")],
+  async (req, res) => {
+    try {
+      const organization = await getOrgs();
+      res.status(201).json(organization);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ msg: "Server error", error });
+    }
+  }
+);
+
+
 app.post(
   "/organization/create",
   [authenticate, authorize("governer")],
