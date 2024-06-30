@@ -13,6 +13,11 @@ async function getOrgs(query) {
   const orgs = await Organization.find(query).populate("admin");
   return orgs;
 }
+async function getOrg(id) {
+  const orgs = await Organization.findOne({org_id:id}).populate("admin");
+  return orgs;
+}
+
 // Create Organization with Admin Credentials
 async function createOrgWithAdminCred({
   name,
@@ -44,17 +49,18 @@ async function createOrgWithAdminCred({
   return organization;
 }
 
+
 // Edit Organization
-async function editOrg(id, data) {
-  const organization = await Organization.findByIdAndUpdate(id, data, {
+async function editOrg(org_id, data) {
+  const organization = await Organization.findOneAndUpdate({org_id:org_id}, data, {
     new: true,
   });
   return organization;
 }
 
 // Delete Organization Forever
-async function deleteOrgForever(id) {
-  const organization = await Organization.findById(id);
+async function deleteOrgForever(org_id) {
+  const organization = await Organization.findOne({org_id:org_id});
   if (!organization) {
     throw new Error("Organization not found");
   }
@@ -68,12 +74,13 @@ async function deleteOrgForever(id) {
   await Subject.deleteMany({ organization: organization._id });
 
   // Delete the organization
-  await Organization.findByIdAndDelete(id);
+  await Organization.findByIdAndDelete(org_id);
   return true;
 }
 
 module.exports = {
   getOrgs,
+  getOrg,
   createOrgWithAdminCred,
   editOrg,
   deleteOrgForever,

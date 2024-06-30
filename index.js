@@ -56,6 +56,7 @@ const {
   editOrg,
   deleteOrgForever,
   getOrgs,
+  getOrg,
 } = require("./org/Org");
 
 const {
@@ -185,7 +186,7 @@ app.delete(
 
 app.delete(
   "/auth/user/delete",
-  [authenticate, authorize("viewer"), checkOrganization],
+  [authenticate,  checkOrganization],
   async (req, res) => {
     try {
       console.log(req.body);
@@ -213,6 +214,19 @@ app.get(
   }
 );
 
+app.get(
+  "/organization/get/:id",
+  [authenticate, authorize("governer")],
+  async (req, res) => {
+    try {
+      const organization = await getOrg(req.params.id);
+      res.status(201).json(organization);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ msg: "Server error", error });
+    }
+  }
+);
 
 app.post(
   "/organization/create",
@@ -229,11 +243,56 @@ app.post(
 );
 // curl -H 'Content-Type: application/json'  -d '{"name":"no_name","org_id":"nothing","admin_username":"karthikkrazy","admin_password":"iloveqwertyA@123"}' -X POST http://localhost:5000/organization/create
 
+
+
+app.get(
+  "/organization/get_mine",
+  [authenticate, authorize("admin"),checkOrganization],
+  async (req, res) => {
+    try {
+      const organization = await getOrg(req.organization.org_id);
+      res.status(201).json(organization);
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ msg: "Server error", error });
+    }
+  }
+);
+
+// Route to edit an organization
+app.post(
+  "/organization/edit_mine/",
+  [authenticate, authorize("admin"),checkOrganization],
+  async (req, res) => {
+    try {
+      const organization = await editOrg(req.organization.org_id, req.body);
+      res.status(200).json(organization);
+    } catch (error) {
+      res.status(500).json({ msg: "Server error", error });
+    }
+  }
+);
+
+// Route to delete an organization forever
+app.delete(
+  "/organization/delete_mine/",
+  [authenticate, authorize("admin"),checkOrganization],
+  async (req, res) => {
+    try {
+      await deleteOrgForever(req.organization.org_id);
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ msg: "Server error", error });
+    }
+  }
+);
+
+
+
 // Route to edit an organization
 app.post(
   "/organization/edit/:id",
-  authenticate,
-  authorize("governer"),
+  [authenticate, authorize("governer")],
   async (req, res) => {
     try {
       const organization = await editOrg(req.params.id, req.body);
@@ -247,8 +306,7 @@ app.post(
 // Route to delete an organization forever
 app.delete(
   "/organization/delete/:id",
-  authenticate,
-  authorize("governer"),
+  [authenticate, authorize("governer")],
   async (req, res) => {
     try {
       await deleteOrgForever(req.params.id);
