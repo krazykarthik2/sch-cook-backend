@@ -2,8 +2,8 @@ const { getBranchById } = require("./Branch");
 
 // Timetable Functions (Nested within Section)
 
-async function getSectionTimetable(branch_id, section_id) {
-  const branch = await getBranchById(branch_id);
+async function getSectionTimetable(org_id,branch_id, section_id) {
+  const branch = await getBranchById(org_id,branch_id);
   const sec__ = branch.sections.find((e) => e.sec_id == section_id);
   if (branch) {
     const section = branch.sections.id(sec__._id);
@@ -17,8 +17,8 @@ async function getSectionTimetable(branch_id, section_id) {
   }
 }
 
-async function editSectionTimetable(branch_id, section_id, timetable) {
-  const branch = await getBranchById(branch_id);
+async function editSectionTimetable(org_id,branch_id, section_id, timetable) {
+  const branch = await getBranchById(org_id,branch_id);
   const sec__ = branch.sections.find((e) => e.sec_id == section_id);
   if (branch) {
     const section = branch.sections.id(sec__._id);
@@ -34,8 +34,8 @@ async function editSectionTimetable(branch_id, section_id, timetable) {
   }
 }
 
-async function deleteSectionTimetable(branch_id, section_id) {
-  const branch = await getBranchById(branch_id);
+async function deleteSectionTimetable(org_id,branch_id, section_id) {
+  const branch = await getBranchById(org_id,branch_id);
   const sec__ = branch.sections.find((e) => e.sec_id == section_id);
   if (branch) {
     const section = branch.sections.id(sec__._id);

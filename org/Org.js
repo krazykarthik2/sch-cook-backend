@@ -10,11 +10,15 @@ const {
 } = require("../models");
 const bcrypt = require("bcryptjs");
 async function getOrgs(query) {
-  const orgs = await Organization.find(query).populate("admin");
+  const orgs = await Organization.find(query).populate("admin", {
+    password: 0,
+  });
   return orgs;
 }
 async function getOrg(id) {
-  const orgs = await Organization.findOne({org_id:id}).populate("admin");
+  const orgs = await Organization.findOne({ org_id: id }).populate("admin", {
+    password: 0,
+  });
   return orgs;
 }
 
@@ -49,18 +53,21 @@ async function createOrgWithAdminCred({
   return organization;
 }
 
-
 // Edit Organization
 async function editOrg(org_id, data) {
-  const organization = await Organization.findOneAndUpdate({org_id:org_id}, data, {
-    new: true,
-  });
+  const organization = await Organization.findOneAndUpdate(
+    { org_id: org_id },
+    data,
+    {
+      new: true,
+    }
+  );
   return organization;
 }
 
 // Delete Organization Forever
 async function deleteOrgForever(org_id) {
-  const organization = await Organization.findOne({org_id:org_id});
+  const organization = await Organization.findOne({ org_id: org_id });
   if (!organization) {
     throw new Error("Organization not found");
   }

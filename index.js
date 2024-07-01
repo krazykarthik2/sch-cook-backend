@@ -28,7 +28,6 @@ const {
   getSubjects,
   getSubjectById,
   getEmpRelations,
-  getEmpRelationBy_Id,
   createEmpRelation,
   editEmpRelation,
   deleteEmpRelation,
@@ -109,7 +108,7 @@ app.get("/", async (req, res) => {
 //auth
 app.post("/auth/login", async (req, res) => {
   try {
-    console.log(req.body);
+    
     const result__ = await login(req.body.username, req.body.password);
     res.status(201).json(result__);
   } catch (error) {
@@ -128,7 +127,7 @@ app.post(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      console.log(req.body);
+      
       const result__ = await addAdminLogin(req.body, req.organization._id);
       res.status(201).json(result__);
     } catch (error) {
@@ -141,7 +140,7 @@ app.post(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      console.log(req.body);
+      
       const result__ = await addViewerLogin(req.body, req.organization._id);
       res.status(201).json(result__);
     } catch (error) {
@@ -154,7 +153,7 @@ app.delete(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      console.log(req.body);
+      
       const result__ = await deleteUser(req.user);
       res.status(201).json(result__);
     } catch (error) {
@@ -168,7 +167,7 @@ app.delete(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      console.log(req.body);
+      
       const viewer = await getAuthOf(req.body.viewer_id);
       if (!viewer) {
         return res.status(401).json({ msg: "User not found" });
@@ -189,7 +188,7 @@ app.delete(
   [authenticate,  checkOrganization],
   async (req, res) => {
     try {
-      console.log(req.body);
+      
       const result__ = await deleteUser(req.user);
       res.status(201).json(result__);
     } catch (error) {
@@ -323,8 +322,8 @@ app.post(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      console.log(req.body);
-      const employee = await createEmployee(req.body);
+      
+      const employee = await createEmployee(req.organization._id,req.body);
       res.status(201).json(employee);
     } catch (error) {
       res.status(500).send(error.message);
@@ -337,7 +336,7 @@ app.post(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      const employee = await editEmployee(req.params.id, req.body);
+      const employee = await editEmployee(req.organization._id,req.params.id, req.body);
       res.json(employee);
     } catch (error) {
       res.status(500).send(error.message);
@@ -350,7 +349,7 @@ app.delete(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      await deleteEmployee(req.params.id);
+      await deleteEmployee(req.organization._id,req.params.id);
       res.status(201).json({ result: "success" });
     } catch (error) {
       res.status(500).send(error.message);
@@ -364,14 +363,15 @@ app.all(
   async (req, res) => {
     try {
       let employees;
-      console.log(req.body);
+      
       if (req.body.get) {
-        employees = await getEmployees({ emp_id: { $in: req.body.get } });
+        employees = await getEmployees(req.organization._id,{ emp_id: { $in: req.body.get } });
       } else {
-        employees = await getEmployees(req.query);
+        employees = await getEmployees(req.organization._id,req.query);
       }
       res.json(employees);
     } catch (error) {
+      console.error(error)
       res.status(500).send(error.message);
     }
   }
@@ -384,7 +384,7 @@ app.get(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      const employee = await getEmployeeById(req.params.id);
+      const employee = await getEmployeeById(req.organization._id,req.params.id);
       res.json(employee);
     } catch (error) {
       res.status(500).send(error.message);
@@ -398,8 +398,7 @@ app.get(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      const timetable = await getEmployeeSchedule(req.params.id);
-      console.log(timetable);
+      const timetable = await getEmployeeSchedule(req.organization._id,req.params.id);
       res.json(timetable);
     } catch (error) {
       res.status(500).send(error.message);
@@ -414,7 +413,7 @@ app.post(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      const branch = await createBranch(req.body);
+      const branch = await createBranch(req.organization._id,req.body);
       res.status(201).json(branch);
     } catch (error) {
       res.status(500).send(error.message);
@@ -428,7 +427,7 @@ app.post(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      const branch = await editBranch(req.params.id, req.body);
+      const branch = await editBranch(req.organization._id,req.params.id, req.body);
       res.json(branch);
     } catch (error) {
       res.status(500).send(error.message);
@@ -442,7 +441,7 @@ app.delete(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      await deleteBranch(req.params.id);
+      await deleteBranch(req.organization._id,req.params.id);
       res.status(201).json({ result: "success" });
     } catch (error) {
       res.status(500).send(error.message);
@@ -456,7 +455,7 @@ app.get(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      const branches = await getBranches_simple(req.query);
+      const branches = await getBranches_simple(req.organization._id,req.query);
       res.json(branches);
     } catch (error) {
       res.status(500).send(error.message);
@@ -472,9 +471,9 @@ app.all(
     try {
       let branches;
       if (req.body.get) {
-        branches = await getBranches({ branch_id: { $in: req.body.get } });
+        branches = await getBranches(req.organization._id,{ branch_id: { $in: req.body.get } });
       } else {
-        branches = await getBranches(req.query);
+        branches = await getBranches(req.organization._id,req.query);
       }
       res.json(branches);
     } catch (error) {
@@ -489,7 +488,7 @@ app.get(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      const branch = await getBranchById(req.params.id);
+      const branch = await getBranchById(req.organization._id,req.params.id);
       res.json(branch);
     } catch (error) {
       res.status(500).send(error.message);
@@ -505,9 +504,10 @@ app.post(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      const branch = await createBranchCode(req.body);
+      const branch = await createBranchCode(req.organization._id,req.body);
       res.status(201).json(branch);
     } catch (error) {
+      console.error(error)
       res.status(500).send(error.message);
     }
   }
@@ -519,7 +519,7 @@ app.post(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      const branch = await editBranchCode(req.params.id, req.body);
+      const branch = await editBranchCode(req.organization._id,req.params.id, req.body);
       res.json(branch);
     } catch (error) {
       res.status(500).send(error.message);
@@ -533,7 +533,7 @@ app.delete(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      await deleteBranchCode(req.params.id);
+      await deleteBranchCode(req.organization._id,req.params.id);
       res.status(201).json({ result: "success" });
     } catch (error) {
       res.status(500).send(error.message);
@@ -549,11 +549,11 @@ app.all(
     try {
       let branchcodes;
       if (req.body.get) {
-        branchcodes = await getBranchCodes({
+        branchcodes = await getBranchCodes(req.organization._id,{
           branch_code: { $in: req.body.get },
         });
       } else {
-        branchcodes = await getBranchCodes(req.query);
+        branchcodes = await getBranchCodes(req.organization._id,req.query);
       }
       res.json(branchcodes);
     } catch (error) {
@@ -568,7 +568,7 @@ app.get(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      const branchcode = await getBranchCodeById(req.params.id);
+      const branchcode = await getBranchCodeById(req.organization._id,req.params.id);
       res.json(branchcode);
     } catch (error) {
       res.status(500).send(error.message);
@@ -583,7 +583,7 @@ app.post(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      const section = await createSection(req.params.branch_id, req.body);
+      const section = await createSection(req.organization._id,req.params.branch_id, req.body);
       res.status(201).json(section);
     } catch (error) {
       res.status(500).send(error.message);
@@ -597,7 +597,7 @@ app.post(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      const section = await editSection(
+      const section = await editSection(req.organization._id,
         req.params.branch_id,
         req.params.id,
         req.body
@@ -615,7 +615,7 @@ app.delete(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      await deleteSection(req.params.branch_id, req.params.id);
+      await deleteSection(req.organization._id,req.params.branch_id, req.params.id);
       res.status(201).json({ result: "success" });
     } catch (error) {
       res.status(500).send(error.message);
@@ -630,7 +630,7 @@ app.get(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      const timetable = await getSectionTimetable(
+      const timetable = await getSectionTimetable(req.organization._id,
         req.params.branch_id,
         req.params.section_id
       );
@@ -647,7 +647,7 @@ app.post(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      const timetable = await editSectionTimetable(
+      const timetable = await editSectionTimetable(req.organization._id,
         req.params.branch_id,
         req.params.section_id,
         req.body.timetable
@@ -666,7 +666,7 @@ app.delete(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      await deleteSectionTimetable(req.params.branch_id, req.params.section_id);
+      await deleteSectionTimetable(req.organization._id,req.params.branch_id, req.params.section_id);
       res.status(201).json({ result: "success" });
     } catch (error) {
       res.status(500).send(error.message);
@@ -682,9 +682,9 @@ app.all(
     try {
       let subjects;
       if (req.body.get) {
-        subjects = await getSubjects({ subject_id: { $in: req.body.get } });
+        subjects = await getSubjects(req.organization._id,{ subject_id: { $in: req.body.get } });
       } else {
-        subjects = await getSubjects(req.query);
+        subjects = await getSubjects(req.organization._id,req.query);
       }
       res.json(subjects);
     } catch (error) {
@@ -698,7 +698,7 @@ app.get(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      const subject = await getSubjectById(req.params.id);
+      const subject = await getSubjectById(req.organization._id,req.params.id);
       res.json(subject);
     } catch (error) {
       res.status(500).send(error.message);
@@ -711,7 +711,7 @@ app.post(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      const subject = await createSubject(req.body);
+      const subject = await createSubject(req.organization._id,req.body);
       res.status(201).json(subject);
     } catch (error) {
       res.status(500).send(error.message);
@@ -725,8 +725,8 @@ app.post(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      console.log(req.body);
-      const subject = await editSubject(req.params.id, req.body);
+      
+      const subject = await editSubject(req.organization._id,req.params.id, req.body);
       res.json(subject);
     } catch (error) {
       res.status(500).send(error.message);
@@ -740,7 +740,7 @@ app.delete(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      await deleteSubject(req.params.id);
+      await deleteSubject(req.organization._id,req.params.id);
       res.status(201).json({ result: "success" });
     } catch (error) {
       res.status(500).send(error.message);
@@ -766,9 +766,9 @@ app.all(
         if (req.body.get.subject_id)
           opt.subject_id = { $in: req.body.get.subject_id };
 
-        relations = await getEmpRelations(opt);
+        relations = await getEmpRelations(req.organization._id,opt);
       } else {
-        relations = await getEmpRelations(req.query);
+        relations = await getEmpRelations(req.organization._id,req.query);
       }
       res.json(relations);
     } catch (error) {
@@ -784,7 +784,7 @@ app.get(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      const relation = await getEmpRelationBy_Id(req.params.id);
+      const relation = await getEmpRelationBy_Id(req.organization._id,req.params.id);
       res.json(relation);
     } catch (error) {
       res.status(500).send(error.message);
@@ -798,7 +798,7 @@ app.post(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      const relation = await createEmpRelation(req.body);
+      const relation = await createEmpRelation(req.organization._id,req.body);
       res.status(201).json(relation);
     } catch (error) {
       res.status(500).send(error.message);
@@ -812,7 +812,7 @@ app.post(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      const relation = await editEmpRelation(req.params.id, req.body);
+      const relation = await editEmpRelation(req.organization._id,req.params.id, req.body);
       res.json(relation);
     } catch (error) {
       res.status(500).send(error.message);
@@ -826,7 +826,7 @@ app.delete(
   [authenticate, authorize("admin"), checkOrganization],
   async (req, res) => {
     try {
-      await deleteEmpRelation(req.params.id);
+      await deleteEmpRelation(req.organization._id,req.params.id);
       res.status(201).json({ result: "success" });
     } catch (error) {
       res.status(500).send(error.message);

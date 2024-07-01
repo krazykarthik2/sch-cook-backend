@@ -32,7 +32,6 @@ const {
   editEmpRelation,
   deleteEmpRelation,
   getEmpRelations,
-  getEmpRelationBy_Id,
 } = require("./EmployeeRelation");
 const {
   createBranchCode,
@@ -69,7 +68,6 @@ module.exports = {
   editEmpRelation,
   deleteEmpRelation,
   getEmpRelations,
-  getEmpRelationBy_Id,
   createBranchCode,
   editBranchCode,
   deleteBranchCode,

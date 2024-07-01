@@ -8,7 +8,6 @@ function generateToken(user) {
   const json = {
     user: { id: user._id, role: user.role, ...opts },
   };
-  console.log(json);
   return jwt.sign(
     json,
     process.env.JWT_SECRET,
@@ -20,11 +19,9 @@ function generateToken(user) {
 async function login(username, password) {
   //for governers
   let user = await User.findOne({ username: username, role: "governer" });//checking if he's a gov.
-  console.log(user)
   if (!user) {
     user = await User.findOne({ username }).populate("organization");
   }
-  console.log(user)
   if (!user) {
     throw new Error("Invalid credentials");
   }
